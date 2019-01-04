@@ -36,13 +36,13 @@ import { HttpMethod, ServicePreProcessor } from './server-types';
  * GET http://mydomain/people/123
  * ```
  */
-export function Path(path: string) {
+export function Path(path: string, nextIfHeadersSent: boolean = true) {
     return function (...args: Array<any>) {
         args = _.without(args, undefined);
         if (args.length === 1) {
-            return PathTypeDecorator.apply(this, [args[0], path]);
+            return PathTypeDecorator.apply(this, [args[0], path, nextIfHeadersSent]);
         } else if (args.length === 3 && typeof args[2] === 'object') {
-            return PathMethodDecorator.apply(this, [args[0], args[1], args[2], path]);
+            return PathMethodDecorator.apply(this, [args[0], args[1], args[2], path, nextIfHeadersSent]);
         }
 
         throw new Error('Invalid @Path Decorator declaration.');
@@ -943,10 +943,11 @@ function AcceptMethodDecorator(target: any, propertyKey: string,
 /**
  * Decorator processor for [[Path]] decorator on classes
  */
-function PathTypeDecorator(target: Function, path: string) {
+function PathTypeDecorator(target: Function, path: string, nextIfHeadersSent: boolean) {
     const classData: metadata.ServiceClass = InternalServer.get().registerServiceClass(target);
     if (classData) {
         classData.path = path;
+        classData.nextIfHeadersSent = nextIfHeadersSent;
     }
 }
 
@@ -954,10 +955,11 @@ function PathTypeDecorator(target: Function, path: string) {
  * Decorator processor for [[Path]] decorator on methods
  */
 function PathMethodDecorator(target: any, propertyKey: string,
-    descriptor: PropertyDescriptor, path: string) {
+    descriptor: PropertyDescriptor, path: string, nextIfHeadersSent: boolean) {
     const serviceMethod: metadata.ServiceMethod = InternalServer.get().registerServiceMethod(target.constructor, propertyKey);
     if (serviceMethod) { // does not intercept constructor
         serviceMethod.path = path;
+        serviceMethod.nextIfHeadersSent = nextIfHeadersSent;
     }
 }
 

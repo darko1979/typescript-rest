@@ -17,6 +17,7 @@ export class ServiceClass {
 
     public targetClass: any;
     public path: string;
+    public nextIfHeadersSent: boolean;
     public roles: Array<string>;
     public preProcessors: Array<PreprocessorFunction>;
     public methods: Map<string, ServiceMethod>;
@@ -45,6 +46,7 @@ export class ServiceClass {
 export class ServiceMethod {
     public name: string;
     public path: string;
+    public nextIfHeadersSent: boolean;
     public roles: Array<string>;
     public resolvedPath: string;
     public httpMethod: HttpMethod;

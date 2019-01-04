@@ -302,7 +302,8 @@ export class InternalServer {
                     await this.runPreprocessors(allPreprocessors, req);
                 }
                 await this.callTargetEndPoint(serviceClass, serviceMethod, req, res, next);
-                next();
+                console.log(`res.headersSent: ${res.headersSent}, serviceClass.nextIfHeadersSent: ${serviceClass.nextIfHeadersSent}, serviceMethod.nextIfHeadersSent: ${serviceMethod.nextIfHeadersSent}, call next: ${!res.headersSent || (serviceClass.nextIfHeadersSent && serviceMethod.nextIfHeadersSent)}`);
+                if (!res.headersSent || (serviceClass.nextIfHeadersSent && serviceMethod.nextIfHeadersSent)) next();
             }
             catch (err) {
                 next(err);
